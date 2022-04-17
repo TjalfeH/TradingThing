@@ -36,10 +36,11 @@ while True:
         
         for to_sell in range(len(bought_prices)):
             _set = [bought_prices[to_sell], price, price-bought_prices[to_sell]]
-            bought_prices.pop(to_sell)
             sold_sets.append(_set)
             
             print("Sell: " + str(_set))
-            print("Total Profit: " + str(calculate_total_profit()))            
+
+        bought_prices = []
+        print("Total Profit: " + str(calculate_total_profit()))            
 
         
