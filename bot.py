@@ -5,42 +5,39 @@ import random
 
 print("Starting machine...")
 
-bought_prices = []
-sold_sets = []
+total_profit = 0
 
-def calculate_total_profit():
-    total_profit = 0
-         
-    for sets in sold_sets:
-        total_profit += sets[2]
-
-    return total_profit
+bought = {"USDT": [],
+          "DAI": [],
+          "BUSD": [],
+          "TUSD": [],
+          "USDC": [],
+          "UST": []}
 
 while True:
-    time.sleep(10)
-    
-    # Get Bitcoin data
-    data = yf.download(tickers='USDC-USD', period = '10h', interval = '1m')["Close"]
+    prices = {"USDT": yf.download(tickers='USDT-USD', period = '5h', interval = '1m', progress=False)["Close"][-1],
+              "DAI": yf.download(tickers='DAI-USD', period = '5h', interval = '1m', progress=False)["Close"][-1],
+              "BUSD": yf.download(tickers='BUSD-USD', period = '5h', interval = '1m', progress=False)["Close"][-1],
+              "TUSD": yf.download(tickers='TUSD-USD', period = '5h', interval = '1m', progress=False)["Close"][-1],
+              "USDC": yf.download(tickers='USDC-USD', period = '5h', interval = '1m', progress=False)["Close"][-1],
+              "UST": yf.download(tickers='UST-USD', period = '5h', interval = '1m', progress=False)["Close"][-1]}
 
-    price = data[len(data)-1]
+    buy_tick = min(prices, key=prices.get)
 
-    if(price < 1):
-        print("Buy: " + str(price))
-        bought_prices.append(price)
+    _price = prices[buy_tick]
 
-    if(price >= 1):
+    if(_price < 1):
+        bought[buy_tick].append(_price)
+        print("Buying " + buy_tick + ": " + str(_price))
+
+    for key, value in prices.items():
+        _tick_profit = 0
         
-        if(len(bought_prices) == 0):
-            print("Nothing to sell: " + str(price))
-            continue
-        
-        for to_sell in range(len(bought_prices)):
-            _set = [bought_prices[to_sell], price, price-bought_prices[to_sell]]
-            sold_sets.append(_set)
+        if(value >= 1):
+            for _bought_tick in bought[key]:
+                _tick_profit += value-_bought_tick
+            if(len(bought[key]) > 0):
+                print("Sold " + key + " for " + str(_tick_profit) + " profit!")
+                total_profit += _tick_profit
+                bought[key] = []
             
-            print("Sell: " + str(_set))
-
-        bought_prices = []
-        print("Total Profit: " + str(calculate_total_profit()))            
-
-        
